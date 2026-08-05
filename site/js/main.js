@@ -49,7 +49,14 @@
         }
       }
     },
-    { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
+    /* Fire when the element is genuinely ON screen, not as it clips the bottom
+       edge. The old -40px fired with ~65px of a rail item showing — its top at
+       93% down the viewport — so a 690ms sequence finished while the content was
+       still in peripheral vision and was over before you looked at it. Shrinking
+       the root by a quarter of the viewport moves the trigger to roughly 70%
+       down, so the motion happens where the eye is. Percentage rather than px so
+       it scales with the viewport instead of firing at the edge on tall screens. */
+    { threshold: 0.15, rootMargin: "0px 0px -25% 0px" }
   );
 
   for (var k = 0; k < els.length; k++) io.observe(els[k]);
