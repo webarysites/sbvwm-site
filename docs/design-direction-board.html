@@ -1,0 +1,481 @@
+<title>SBV — Design Direction</title>
+<style>
+  :root{
+    --burgundy:#651725;
+    --burgundy-deep:#4A0F1B;
+    --action:#9F2430;
+    --ground:#FAF8F6;
+    --ground-alt:#F2EDE9;
+    --ink:#231F20;
+    --muted:#6B625F;
+    --line:#E6DFDA;
+    --gold:#F6BC53;
+    --white:#FFFFFF;
+
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI Variable Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "Cascadia Mono", SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+
+    --measure: 62ch;
+    --pad: clamp(1.25rem, 4vw, 3.5rem);
+    --maxw: 1080px;
+  }
+
+  /* Deliberately single-theme: this board IS a light-ground brand palette.
+     Rendering it on a dark field would misrepresent the deliverable. */
+
+  .board{
+    background:var(--ground);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:4rem;
+  }
+  .board *,.board *::before,.board *::after{box-sizing:border-box;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding-inline:var(--pad);}
+
+  /* ---- board furniture: mono, so annotation never reads as brand type ---- */
+  .lbl{
+    font-family:var(--mono);
+    font-size:.6875rem;
+    letter-spacing:.11em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .panel{border-top:1px solid var(--line);padding-block:clamp(2.5rem,6vw,4.5rem);}
+  .panel-head{display:flex;flex-wrap:wrap;gap:.5rem 1.25rem;align-items:baseline;margin-bottom:2rem;}
+  .panel-head h2{
+    font-size:clamp(1.25rem,2.4vw,1.5rem);
+    font-weight:640;
+    letter-spacing:-.015em;
+    margin:0;
+    text-wrap:balance;
+  }
+  .note{
+    font-family:var(--mono);
+    font-size:.75rem;
+    line-height:1.65;
+    color:var(--muted);
+    max-width:52ch;
+  }
+  .stack{display:flex;flex-direction:column;}
+
+  /* ---- masthead ---- */
+  .mast{
+    background:var(--burgundy);
+    color:#F7EDEA;
+    padding-block:clamp(3rem,8vw,5.5rem);
+    position:relative;
+    overflow:hidden;
+  }
+  .mast .wrap{position:relative;z-index:1;}
+  .mast .eyebrow{color:#D9A7AE;}
+  .mast h1{
+    font-size:clamp(2.25rem,5.5vw,3.5rem);
+    line-height:1.05;
+    letter-spacing:-.03em;
+    font-weight:680;
+    margin:1.25rem 0 0;
+    max-width:20ch;
+    text-wrap:balance;
+  }
+  .mast p{
+    margin:1.5rem 0 0;
+    max-width:56ch;
+    color:#E8CFD2;
+    font-size:1.0625rem;
+  }
+  .mast-meta{
+    display:flex;flex-wrap:wrap;gap:.6rem 1.5rem;
+    margin-top:2.5rem;padding-top:1.5rem;
+    border-top:1px solid rgba(247,237,234,.18);
+    color:#C99AA2;
+  }
+  /* clock ticks — the one motif, kept ambient */
+  .ticks{
+    position:absolute;
+    width:min(52vw,540px);aspect-ratio:1;
+    right:-8%;top:50%;transform:translateY(-50%);
+    background:repeating-conic-gradient(from 0deg,
+      rgba(247,237,234,.30) 0deg .35deg, transparent .35deg 6deg);
+    -webkit-mask:radial-gradient(closest-side,transparent 71%,#000 72%,#000 78%,transparent 79%);
+    mask:radial-gradient(closest-side,transparent 71%,#000 72%,#000 78%,transparent 79%);
+    pointer-events:none;
+  }
+
+  /* ---- thesis ---- */
+  .thesis p{
+    font-size:clamp(1.125rem,2.1vw,1.3125rem);
+    line-height:1.62;
+    max-width:var(--measure);
+    margin:0 0 1.15em;
+  }
+  .thesis strong{font-weight:640;}
+  .roles{
+    display:grid;gap:1px;
+    grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+    background:var(--line);
+    border:1px solid var(--line);
+    margin-top:2.5rem;
+  }
+  .role{background:var(--ground);padding:1.35rem 1.4rem;}
+  .role h3{margin:.6rem 0 .4rem;font-size:1rem;font-weight:640;letter-spacing:-.01em;}
+  .role p{margin:0;font-size:.9375rem;color:var(--muted);line-height:1.55;}
+
+  /* ---- palette ---- */
+  .swatches{display:grid;gap:1px;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));background:var(--line);border:1px solid var(--line);}
+  .sw{background:var(--ground);}
+  .sw .chip{height:118px;border-bottom:1px solid var(--line);}
+  .sw .meta{padding:.85rem .9rem 1rem;}
+  .sw .name{font-size:.9375rem;font-weight:620;letter-spacing:-.01em;}
+  .sw .hex{font-family:var(--mono);font-size:.75rem;color:var(--muted);margin-top:.2rem;letter-spacing:.02em;}
+  .sw .use{font-size:.8125rem;color:var(--muted);margin-top:.5rem;line-height:1.45;}
+  .sw.optional .chip{position:relative;}
+  .sw.optional .chip::after{
+    content:"optional";
+    position:absolute;left:.6rem;bottom:.55rem;
+    font-family:var(--mono);font-size:.625rem;letter-spacing:.1em;text-transform:uppercase;
+    background:rgba(35,31,32,.82);color:#fff;padding:.2rem .45rem;
+  }
+
+  /* ---- type specimen ---- */
+  .spec{border:1px solid var(--line);background:var(--white);}
+  .spec-row{display:grid;grid-template-columns:88px 1fr;gap:1.5rem;padding:1.5rem 1.5rem;border-bottom:1px solid var(--line);align-items:baseline;}
+  .spec-row:last-child{border-bottom:0;}
+  .spec-row .lbl{padding-top:.45rem;}
+  .t-h1{font-size:clamp(1.9rem,4.4vw,2.9rem);line-height:1.06;letter-spacing:-.032em;font-weight:680;text-wrap:balance;}
+  .t-h2{font-size:clamp(1.4rem,2.8vw,1.85rem);line-height:1.18;letter-spacing:-.022em;font-weight:640;}
+  .t-lead{font-size:1.1875rem;line-height:1.6;color:var(--ink);max-width:var(--measure);}
+  .t-body{font-size:1rem;line-height:1.68;color:var(--ink);max-width:var(--measure);}
+  .t-eyebrow{font-size:.75rem;letter-spacing:.13em;text-transform:uppercase;font-weight:620;color:var(--action);}
+
+  /* ---- the 700 moment ---- */
+  .proof{
+    border:1px solid var(--line);
+    background:var(--white);
+    padding:clamp(2.5rem,6vw,4.5rem) var(--pad);
+    position:relative;overflow:hidden;
+    text-align:center;
+  }
+  .proof .num-wrap{
+    position:relative;
+    display:inline-flex;align-items:center;justify-content:center;
+    width:min(86vw,460px);height:min(86vw,460px);
+  }
+  .proof .ticks-light{
+    position:absolute;inset:0;
+    background:repeating-conic-gradient(from 0deg,
+      rgba(101,23,37,.17) 0deg .4deg, transparent .4deg 6deg);
+    -webkit-mask:radial-gradient(closest-side,transparent 90%,#000 91%,#000 99%,transparent 100%);
+    mask:radial-gradient(closest-side,transparent 90%,#000 91%,#000 99%,transparent 100%);
+    pointer-events:none;
+  }
+  .proof .inner{position:relative;z-index:1;}
+  .proof .num{
+    font-size:clamp(4.5rem,15vw,10rem);
+    line-height:.86;
+    font-weight:700;
+    letter-spacing:-.045em;
+    color:var(--burgundy);
+    font-variant-numeric:tabular-nums;
+  }
+  .proof .num sup{font-size:.34em;font-weight:640;letter-spacing:-.01em;top:-1.15em;margin-left:.06em;}
+  .proof .cap{
+    margin:1.75rem auto 0;max-width:34ch;
+    font-size:clamp(1.0625rem,2.2vw,1.25rem);
+    line-height:1.5;color:var(--ink);text-wrap:balance;
+  }
+
+  /* ---- capability grid ---- */
+  .caps{display:grid;gap:1px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));background:var(--line);border:1px solid var(--line);}
+  .cap{background:var(--white);padding:1.75rem 1.6rem;}
+  .cap h3{margin:0 0 .55rem;font-size:1.0625rem;font-weight:640;letter-spacing:-.015em;}
+  .cap p{margin:0;font-size:.9375rem;line-height:1.6;color:var(--muted);}
+  .cap .rule{width:26px;height:2px;background:var(--action);margin-bottom:1.1rem;}
+
+  /* ---- dark section ---- */
+  .dark{background:var(--burgundy-deep);color:#EFDCDE;padding:clamp(2.75rem,6vw,4rem);}
+  .dark h3{margin:1rem 0 0;font-size:clamp(1.5rem,3.2vw,2.05rem);line-height:1.16;letter-spacing:-.025em;font-weight:660;color:#FBF3F1;max-width:22ch;text-wrap:balance;}
+  .dark p{margin:1.35rem 0 0;max-width:58ch;font-size:1.0625rem;line-height:1.62;color:#DCC0C4;}
+  .dark .eyebrow{color:#C98F98;}
+
+  /* ---- buttons ---- */
+  .btns{display:flex;flex-wrap:wrap;gap:1rem;align-items:center;}
+  .btn{
+    font:inherit;font-size:.9375rem;font-weight:600;letter-spacing:.005em;
+    padding:.8rem 1.5rem;border-radius:5px;border:1px solid transparent;
+    cursor:pointer;text-decoration:none;display:inline-block;
+    transition:background-color .15s ease,border-color .15s ease,color .15s ease;
+  }
+  .btn-primary{background:var(--action);color:#fff;}
+  .btn-primary:hover{background:var(--burgundy);}
+  .btn-secondary{background:transparent;color:var(--burgundy);border-color:var(--line);}
+  .btn-secondary:hover{border-color:var(--burgundy);background:var(--white);}
+  .btn-link{color:var(--action);font-weight:600;text-decoration:none;border-bottom:1px solid rgba(159,36,48,.34);padding-bottom:1px;}
+  .btn-link:hover{border-bottom-color:var(--action);}
+  .btn:focus-visible,.btn-link:focus-visible{outline:2px solid var(--burgundy);outline-offset:3px;}
+
+  /* ---- rhythm strip ---- */
+  .rhythm{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);}
+  .rhythm div{height:104px;display:flex;align-items:flex-end;padding:.75rem .85rem;}
+  .rhythm .r1{background:var(--white);}
+  .rhythm .r2{background:var(--ground-alt);}
+  .rhythm .r3{background:var(--burgundy-deep);}
+  .rhythm .r3 .lbl{color:#C99AA2;}
+
+  /* ---- not-this list ---- */
+  .nots{display:grid;gap:.85rem 2rem;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));margin:0;padding:0;list-style:none;}
+  .nots li{padding-left:1.6rem;position:relative;font-size:.9375rem;line-height:1.55;color:var(--ink);}
+  .nots li::before{
+    content:"";position:absolute;left:0;top:.62em;
+    width:11px;height:1px;background:var(--action);
+  }
+
+  /* ---- decisions table ---- */
+  .tblwrap{overflow-x:auto;border:1px solid var(--line);}
+  table{border-collapse:collapse;width:100%;min-width:520px;background:var(--white);}
+  th,td{text-align:left;padding:.85rem 1.1rem;border-bottom:1px solid var(--line);font-size:.9375rem;vertical-align:top;line-height:1.5;}
+  th{font-family:var(--mono);font-size:.6875rem;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);font-weight:500;}
+  tr:last-child td{border-bottom:0;}
+  td:first-child{font-weight:600;width:38%;}
+
+  .closing{border-top:1px solid var(--line);padding-top:2.5rem;margin-top:1rem;}
+  .closing p{max-width:var(--measure);margin:0 0 1em;}
+
+  @media (max-width:560px){
+    .spec-row{grid-template-columns:1fr;gap:.6rem;}
+    .rhythm{grid-template-columns:1fr;}
+    .rhythm div{height:72px;}
+  }
+
+  /* subtle load sequence — demonstrates the restraint the direction calls for */
+  @media (prefers-reduced-motion:no-preference){
+    .panel,.mast{animation:rise .5s cubic-bezier(.22,.61,.36,1) both;}
+    .panel:nth-of-type(1){animation-delay:.04s}
+    .panel:nth-of-type(2){animation-delay:.08s}
+    .panel:nth-of-type(3){animation-delay:.12s}
+    @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  }
+</style>
+
+<div class="board">
+
+  <header class="mast">
+    <div class="ticks" aria-hidden="true"></div>
+    <div class="wrap">
+      <div class="lbl eyebrow">SBV Workforce Management · Design direction · Draft for approval</div>
+      <h1>Established, calm, and typography&#8209;led.</h1>
+      <p>This board proposes the visual language for the SBV mini&#8209;site. It is not a page layout — approve the language here, and layout follows.</p>
+      <div class="lbl mast-meta">
+        <span>Prepared for client review</span>
+        <span>Supersedes the earlier navy concept</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+
+    <section class="panel thesis">
+      <div class="panel-head">
+        <div class="lbl">01 — The direction</div>
+        <h2>Three sources, three jobs</h2>
+      </div>
+      <p>Build an established, calm, typography&#8209;led site for skilled nursing — <strong>not a startup SaaS template, not a clinical healthcare site.</strong> The credibility comes from one verified number and disciplined hierarchy, not from stock photography we don't have time to source well.</p>
+      <p>Rather than blending reference sites by percentage, each source has a defined job:</p>
+
+      <div class="roles">
+        <div class="role">
+          <div class="lbl">Tone</div>
+          <h3>PointClickCare</h3>
+          <p>Calm, sector-specific, unhurried. Warm neutrals over cold corporate gray. Industry language, not generic HR-speak.</p>
+        </div>
+        <div class="role">
+          <div class="lbl">Discipline</div>
+          <h3>Stripe</h3>
+          <p>Hierarchy, spacing, modular composition, and the treatment of proof at scale. Execution only — none of the startup polish.</p>
+        </div>
+        <div class="role">
+          <div class="lbl">Identity</div>
+          <h3>SBV itself</h3>
+          <p>Burgundy, the clock mark, operational vocabulary, and 700 installed facilities. Neither reference supplies this.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div class="lbl">02 — Palette</div>
+        <h2>Keep the red. Deepen it. Warm the neutrals.</h2>
+      </div>
+      <p class="note">SBV's existing theme runs on #b5222e over cool gray — bright enough to read as an alert state, which is a liability in healthcare. Deepening toward burgundy fixes that while keeping real brand equity. Warm off&#8209;white instead of cool gray is the highest-leverage move for warmth without photography.</p>
+
+      <div class="swatches" style="margin-top:2rem">
+        <div class="sw">
+          <div class="chip" style="background:#651725"></div>
+          <div class="meta"><div class="name">Burgundy</div><div class="hex">#651725</div><div class="use">Brand moments, the 700 figure, dark section ground.</div></div>
+        </div>
+        <div class="sw">
+          <div class="chip" style="background:#9F2430"></div>
+          <div class="meta"><div class="name">Action red</div><div class="hex">#9F2430</div><div class="use">Buttons, links, rules. Deepened from #b5222e to clear WCAG AA.</div></div>
+        </div>
+        <div class="sw">
+          <div class="chip" style="background:#FAF8F6"></div>
+          <div class="meta"><div class="name">Warm off-white</div><div class="hex">#FAF8F6</div><div class="use">Page ground, alternating with pure white.</div></div>
+        </div>
+        <div class="sw">
+          <div class="chip" style="background:#231F20"></div>
+          <div class="meta"><div class="name">Warm near-black</div><div class="hex">#231F20</div><div class="use">Body text. Warm-biased, never a neutral #000.</div></div>
+        </div>
+        <div class="sw">
+          <div class="chip" style="background:#6B625F"></div>
+          <div class="meta"><div class="name">Warm gray</div><div class="hex">#6B625F</div><div class="use">Secondary text, labels, captions.</div></div>
+        </div>
+        <div class="sw optional">
+          <div class="chip" style="background:#F6BC53"></div>
+          <div class="meta"><div class="name">Gold</div><div class="hex">#F6BC53</div><div class="use">Micro-accent only. Burgundy + gold slides toward hospitality — prove the palette without it first.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div class="lbl">03 — Typography</div>
+        <h2>One sans. Hierarchy through weight and space, never color.</h2>
+      </div>
+      <p class="note">Production sets <strong>Inter</strong>. This board renders in the system sans, which is close but not identical — glyph shapes are indicative, the scale and weights are the proposal. Open Sans (the incumbent) is dropped: it reads as a 2016 WordPress theme, which is the exact impression we're shedding.</p>
+
+      <div class="spec" style="margin-top:2rem">
+        <div class="spec-row"><div class="lbl">Eyebrow</div><div class="t-eyebrow">Workforce management for long-term care</div></div>
+        <div class="spec-row"><div class="lbl">H1 · 680</div><div class="t-h1">Workforce management built for skilled nursing.</div></div>
+        <div class="spec-row"><div class="lbl">H2 · 640</div><div class="t-h2">Configured around the way your organization works</div></div>
+        <div class="spec-row"><div class="lbl">Lead</div><div class="t-lead">Time, staffing, payroll preparation, and compliance in one system — supported directly by people who know how skilled nursing operates.</div></div>
+        <div class="spec-row"><div class="lbl">Body</div><div class="t-body">A successful rollout depends on more than installing software. SBV works with your team to understand existing rules, migrate usable data, configure the platform, test payroll workflows, and train users. Body copy is set large enough to read without effort — this audience is not twenty-five.</div></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div class="lbl">04 — The proof moment</div>
+        <h2>The number does the work photography would have done</h2>
+      </div>
+      <p class="note">The hero says what SBV does and for whom. This lands immediately after — the site's single largest element. Wording must be client&#8209;approved and the figure verified before launch. The clock ticks are the one motif, drawn from the logo and the "Make Your Time Count" line; ambient, never an illustration.</p>
+
+      <div class="proof" style="margin-top:2rem">
+        <div class="inner">
+          <div class="num-wrap">
+            <div class="ticks-light" aria-hidden="true"></div>
+            <div class="num">700<sup>+</sup></div>
+          </div>
+          <p class="cap">skilled nursing facilities across the United States run on SBV Workforce Management.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div class="lbl">05 — Capabilities</div>
+        <h2>Structured type, not feature cards</h2>
+      </div>
+      <p class="note">Three of six shown. Thin dividers, a short accent rule, one outcome sentence each. No screenshots, no invented UI, no platform diagram — the legacy interface misrepresents the quality we're claiming, and mocking up screens the product doesn't have is a promise it has to keep at demo time.</p>
+
+      <div class="caps" style="margin-top:2rem">
+        <div class="cap">
+          <div class="rule"></div>
+          <h3>Time &amp; Attendance</h3>
+          <p>Employee records, timecards, punches, pay rules, and audit history in one place.</p>
+        </div>
+        <div class="cap">
+          <div class="rule"></div>
+          <h3>Payroll Based Journal</h3>
+          <p>Direct-care hours organized and prepared for CMS submission.</p>
+        </div>
+        <div class="cap">
+          <div class="rule"></div>
+          <h3>Licenses &amp; Credentials</h3>
+          <p>Certifications, health requirements, expirations, and in-service training tracked against every employee.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div class="lbl">06 — The one dark section</div>
+        <h2>Where the differentiation lands</h2>
+      </div>
+      <p class="note">Used exactly once on the homepage. Burgundy, never navy — navy would pull the whole site back toward generic B2B.</p>
+
+      <div class="dark" style="margin-top:2rem">
+        <div class="lbl eyebrow">Built for long-term care</div>
+        <h3>Staffing a facility is not the same as staffing an office.</h3>
+        <p>Census-driven staffing levels, overnight shifts, multiple job classifications, direct-care reporting, credentials, and multi-facility operations all have to work together — and end in payroll-ready data. SBV is built around that, not adapted to it.</p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div class="lbl">07 — Controls &amp; rhythm</div>
+        <h2>Modest radii, thin borders, almost no shadow</h2>
+      </div>
+
+      <div class="btns">
+        <a href="#" class="btn btn-primary">Talk with SBV</a>
+        <a href="#" class="btn btn-secondary">Client support</a>
+        <a href="#" class="btn-link">See how implementation works</a>
+      </div>
+
+      <div class="lbl" style="margin:2.5rem 0 .75rem">Section grounds, in rotation</div>
+      <div class="rhythm">
+        <div class="r1"><span class="lbl">White</span></div>
+        <div class="r2"><span class="lbl">Warm off-white</span></div>
+        <div class="r3"><span class="lbl">Burgundy · once</span></div>
+      </div>
+      <p class="note" style="margin-top:1.25rem">Motion is limited to gentle hover states and a light fade&#8209;up on section entry — the same restraint this board demonstrates. No counters animating, no parallax, no marquees.</p>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div class="lbl">08 — Deliberately absent</div>
+        <h2>What this direction rules out</h2>
+      </div>
+      <ul class="nots">
+        <li>Stock photography of clinicians or residents</li>
+        <li>Screenshots of the legacy interface</li>
+        <li>Invented UI the product doesn't have</li>
+        <li>An elaborate "connected platform" diagram</li>
+        <li>Navy, teal, or anything else in the category's default blue</li>
+        <li>Gradients, glows, glassmorphism, abstract blobs</li>
+        <li>Isometric artwork and decorative iconography</li>
+        <li>A "we're refreshing our website" banner</li>
+      </ul>
+      <p class="note" style="margin-top:1.75rem">On that last one: a finished small site shouldn't announce that it's temporary. The thinness is only a liability if we point at it. If the client insists, it belongs in the footer as housekeeping — not a top bar, and never in the hero.</p>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div class="lbl">09 — Reconciled</div>
+        <h2>Where the two recommendations differed</h2>
+      </div>
+      <div class="tblwrap">
+        <table>
+          <thead><tr><th scope="col">Question</th><th scope="col">Resolution</th></tr></thead>
+          <tbody>
+            <tr><td>Blue or red?</td><td>Red. The navy concept was a silent rebrand — SBV's actual theme is red, black, and gold.</td></tr>
+            <tr><td>Is 700 the headline?</td><td>No. The hero says what SBV does; 700 lands immediately after as dominant proof, so the value proposition survives if the figure changes.</td></tr>
+            <tr><td>"65% Stripe / 35% PointClickCare"</td><td>Dropped. A percentage isn't actionable and invites importing Stripe's startup polish. Replaced with the three roles above.</td></tr>
+            <tr><td>Temporary-site banner</td><td>Cut. See section 08.</td></tr>
+            <tr><td>Gold accent</td><td>Optional micro-accent only.</td></tr>
+            <tr><td>Implementation and deployment</td><td>Merged into one section — two thin sections read worse than one substantial one.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="closing">
+      <div class="lbl" style="margin-bottom:1rem">What this board does not decide</div>
+      <p>Page layout, section proportions, responsive behaviour, and final copy. Those follow once the language is approved.</p>
+      <p class="note">Blocking before design starts: is <strong>"over 700 skilled nursing facilities"</strong> current, and does it mean active facilities or cumulative installations? Is the red staying? Can the client supply real facility photography — one ask, firm deadline, then we proceed without it.</p>
+    </section>
+
+  </div>
+</div>

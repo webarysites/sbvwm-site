@@ -1,0 +1,939 @@
+/* SBV Workforce Management — mini-site (visual system v2)
+   Direction: docs/design-direction.md + 2026-08-05 revision.
+   White-dominant environment; burgundy is an accent and action color, not the
+   atmosphere. One dark moment only (the closing panel). Soft cards, connected
+   implementation steps, and a punch-to-payroll flow rail. Motion is
+   reveal-on-enter only; content renders fully without JS (see reveal contract). */
+
+/* ---------- tokens ---------- */
+:root {
+  --burgundy: #651725;
+  --burgundy-deep: #4A0F1B;
+  --action: #9F2430;
+  --ground: #F6F4F2;
+  --rose: #F8EFF0;
+  --rose-line: #ECDBDD;
+  --ink: #231F20;
+  --muted: #6B625F;
+  --line: #E7E1DC;
+  --gold: #F6BC53;
+  --white: #FFFFFF;
+  /* channel values so tints derive from the brand instead of being hand-mixed */
+  --burgundy-rgb: 101 23 37;
+  --ink-rgb: 35 31 32;
+  --paper-rgb: 241 222 225;
+
+  --shadow: 0 1px 2px rgb(var(--ink-rgb) / 0.05), 0 4px 14px rgb(var(--ink-rgb) / 0.04);
+  --shadow-lift: 0 2px 4px rgb(var(--ink-rgb) / 0.06), 0 10px 26px rgb(var(--ink-rgb) / 0.07);
+
+  --r-sm: 8px;   /* buttons, small controls */
+  --r-md: 12px;  /* cards, tiles */
+  --r-lg: 16px;  /* panels */
+
+  --shell: 1160px;
+  --pad: clamp(1.25rem, 4vw, 2.5rem);
+  --sec: clamp(4rem, 9vw, 7rem);
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("../fonts/inter-var.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------- base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  margin: 0;
+  background: var(--white);
+  color: var(--ink);
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img { max-width: 100%; height: auto; display: block; }
+h1, h2, h3, p, dl, dd, dt, ul, ol { margin: 0; }
+
+.shell { max-width: var(--shell); margin-inline: auto; padding-inline: var(--pad); }
+
+/* anchor targets must clear the sticky header */
+#main, #top, #solutions, #implementation, #support, #contact { scroll-margin-top: 108px; }
+
+h2 {
+  font-size: clamp(1.85rem, 3.8vw, 2.55rem);
+  line-height: 1.13;
+  letter-spacing: -0.024em;
+  font-weight: 650;
+  text-wrap: balance;
+  max-width: 24ch;
+}
+
+/* ---------- links, buttons, focus ---------- */
+a { color: var(--action); }
+
+.btn {
+  display: inline-block;
+  white-space: nowrap;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.85rem 1.6rem;
+  border-radius: var(--r-sm);
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.btn--solid { background: var(--action); color: var(--white); }
+.btn--solid:hover { background: var(--burgundy); }
+.btn--lg { padding: 1rem 1.9rem; font-size: 1rem; }
+
+/* ---------- shared list icon ----------
+   One marker component for every list on the page. Replaces three hand-coded
+   dash-bullets; the ground adapts to the surface it sits on. */
+.ico {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--rose-line);
+  background: var(--white);
+  color: var(--burgundy);
+}
+
+.textlink {
+  font-weight: 600;
+  color: var(--action);
+  text-decoration: none;
+  border-bottom: 1px solid rgb(159 36 48 / 0.35);
+  padding-bottom: 2px;
+  transition: border-color 0.15s ease;
+}
+.textlink:hover { border-bottom-color: var(--action); }
+
+:focus-visible {
+  outline: 2px solid var(--action);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+.close__panel :focus-visible { outline-color: var(--gold); }
+
+.skip {
+  position: absolute;
+  left: 1rem; top: -3.5rem;
+  z-index: 100;
+  background: var(--burgundy);
+  color: var(--white);
+  padding: 0.6rem 1rem;
+  border-radius: 0 0 8px 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: top 0.15s ease;
+}
+.skip:focus-visible { top: 0; outline-color: var(--gold); }
+
+/* ---------- header ---------- */
+.hd {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+.hd__row {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  min-height: 92px;
+}
+.hd__brand { flex: none; }
+.hd__brand img { width: 96px; height: 70px; object-fit: contain; }
+.hd__nav {
+  display: flex;
+  gap: 1.75rem;
+  margin-left: 0.5rem;
+}
+.hd__nav a {
+  white-space: nowrap;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.35rem 0;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.15s ease;
+}
+.hd__nav a:hover { border-bottom-color: var(--action); }
+.hd__actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.hd__tel {
+  white-space: nowrap;
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+}
+.hd__tel:hover { color: var(--action); }
+.hd__tel-m { display: none; color: var(--action); line-height: 0; padding: 0.35rem; }
+
+/* ---------- hero ---------- */
+.hero { padding-block: clamp(4rem, 9vw, 6.5rem) clamp(3.5rem, 8vw, 6rem); overflow: clip; }
+.hero__title {
+  font-size: clamp(2.6rem, 6.4vw, 4.15rem);
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  font-weight: 680;
+  max-width: 17ch;
+  text-wrap: balance;
+}
+.hero__title .dot { color: var(--action); }
+.hero__sub {
+  font-size: clamp(1.125rem, 2vw, 1.3125rem);
+  line-height: 1.6;
+  color: var(--muted);
+  max-width: 52ch;
+  margin-top: 1.75rem;
+}
+.hero__cta {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+  margin-top: 2.5rem;
+}
+
+/* hero: text left, system diagram right. Abstract enough to carry no invented
+   product copy — no text lives inside the artwork — while showing the shape of
+   the thing: a schedule, a record, an approval, and time. */
+.hero__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
+  gap: clamp(2.5rem, 6vw, 4.5rem);
+  align-items: center;
+}
+.hero__block { max-width: 34rem; }
+.hero__fig { margin: 0; }
+.hero__fig img { width: 100%; height: auto; display: block; }
+
+/* ---------- proof ---------- */
+.proof {
+  background: var(--ground);
+  padding-block: var(--sec);
+}
+.proof__row {
+  display: flex;
+  align-items: center;
+  gap: clamp(2rem, 6vw, 4.5rem);
+  margin-top: 2.5rem;
+  flex-wrap: wrap;
+}
+.proof__figure {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: clamp(260px, 38vw, 400px);
+  aspect-ratio: 1;
+}
+.proof__arc { position: absolute; inset: 0; width: 100%; height: 100%; }
+.proof__arc line { stroke: rgb(var(--burgundy-rgb) / 0.26); stroke-width: 1; }
+.proof__arc line.mj { stroke: rgb(var(--burgundy-rgb) / 0.5); stroke-width: 1.5; }
+.proof__num {
+  font-size: clamp(4.6rem, 13vw, 8.25rem);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  color: var(--burgundy);
+  font-variant-numeric: tabular-nums;
+}
+.proof__num sup {
+  font-size: 0.36em;
+  font-weight: 650;
+  vertical-align: super;
+  margin-left: 0.04em;
+}
+.proof__cap {
+  font-size: clamp(1.5rem, 3vw, 2.05rem);
+  line-height: 1.28;
+  font-weight: 640;
+  letter-spacing: -0.018em;
+  max-width: 22ch;
+  text-wrap: balance;
+}
+.proof__facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+  margin-top: clamp(3rem, 6vw, 4.25rem);
+}
+.proof__facts > div {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow);
+  padding: 1.35rem 1.5rem;
+}
+.proof__facts dt { font-weight: 650; letter-spacing: -0.01em; }
+.proof__facts dd { color: var(--muted); font-size: 1rem; margin-top: 0.35rem; }
+
+/* ---------- section heads ---------- */
+.sec-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2.5rem;
+  flex-wrap: wrap;
+}
+.sec-head__intro {
+  color: var(--muted);
+  max-width: 34ch;
+  padding-bottom: 0.35rem;
+}
+
+/* ---------- flow (the product story, and the page's second anchor) ---------- */
+.flowsec {
+  background: linear-gradient(160deg, var(--burgundy) 0%, var(--burgundy-deep) 100%);
+  color: rgb(var(--paper-rgb));
+  padding-block: var(--sec);
+}
+.flow__title { color: var(--white); max-width: 20ch; }
+.flow__intro {
+  color: #DCBEC3;
+  font-size: clamp(1.0625rem, 1.8vw, 1.1875rem);
+  max-width: 56ch;
+  margin-top: 1.25rem;
+}
+.flow__rail {
+  list-style: none;
+  padding: 0;
+  margin-top: clamp(3rem, 6vw, 4.5rem);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.75rem;
+}
+.flow__rail li { position: relative; }
+/* the rail itself: clock ticks running station to station */
+.flow__rail li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 25px;
+  left: 64px;
+  right: -1.75rem;
+  height: 9px;
+  background-image: repeating-linear-gradient(90deg, rgb(var(--paper-rgb) / 0.5) 0 1.5px, transparent 1.5px 8px);
+}
+.flow__node {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1px solid rgb(var(--paper-rgb) / 0.32);
+  background: rgb(var(--burgundy-rgb) / 0.55);
+  color: var(--gold);
+}
+.flow__rail h3 {
+  margin-top: 1.35rem;
+  font-size: 1.0625rem;
+  font-weight: 650;
+  letter-spacing: -0.012em;
+  color: var(--white);
+}
+.flow__rail p {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: #D2AFB6;
+}
+
+/* ---------- solutions ---------- */
+.sol { padding-block: var(--sec); background: var(--ground); }
+.sol__cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-top: 2.5rem;
+}
+/* Time & Attendance: same shape as every other card, distinguished by tint only */
+.card--tint {
+  background: var(--rose);
+  border-color: var(--rose-line);
+}
+.card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow);
+  padding: 1.75rem 1.6rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.card:hover {
+  border-color: rgb(var(--burgundy-rgb) / 0.3);
+  box-shadow: var(--shadow-lift);
+}
+.card__icon { color: var(--burgundy); line-height: 0; margin-bottom: 1.1rem; }
+.card h3 {
+  font-size: 1.125rem;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+}
+/* :not() keeps the body-copy rule off the footer, whose auto margin pins it
+   to the card bottom so all six footers sit on one line */
+/* The bottom margin here is the minimum gap above the footer rule. It can't live
+   on .card__foot, whose `margin-top: auto` collapses to 0 on the fullest card
+   (Reporting) and lets the rule crowd the last line of copy. */
+.card > p:not(.card__foot) {
+  color: var(--muted);
+  font-size: 1rem;
+  margin-top: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+.card__foot {
+  margin-top: auto;
+  padding-top: 1.05rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--burgundy);
+}
+
+/* solutions section sits on white; cards get depth from the shadow itself */
+.sol .sec-head__intro { padding-bottom: 0.35rem; }
+
+/* ---------- differentiation (light, split) ---------- */
+.diff { background: var(--white); padding-block: var(--sec); }
+.diff__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  gap: clamp(2.5rem, 6vw, 5rem);
+  align-items: center;
+}
+.diff__copy {
+  font-size: clamp(1.125rem, 2vw, 1.25rem);
+  color: var(--muted);
+  margin-top: 1.5rem;
+  max-width: 46ch;
+}
+.diff__note {
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.9375rem;
+  max-width: 52ch;
+}
+.diff__list {
+  list-style: none;
+  padding: 2rem 2.1rem;
+  margin: 0;
+  background: var(--rose);
+  border: 1px solid var(--rose-line);
+  border-radius: var(--r-md);
+  display: flex;
+  flex-direction: column;
+  gap: 0.95rem;
+}
+.diff__list li { display: flex; align-items: center; gap: 0.9rem; font-weight: 550; }
+
+/* ---------- implementation ---------- */
+.impl { background: var(--ground); padding-block: var(--sec); }
+.impl__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.85fr);
+  gap: clamp(2.5rem, 6vw, 4.5rem);
+  margin-top: 3rem;
+  align-items: start;
+}
+.impl__steps {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.impl__steps li {
+  position: relative;
+  display: flex;
+  gap: 1.5rem;
+  padding-bottom: 2.1rem;
+}
+.impl__steps li:last-child { padding-bottom: 0; }
+/* connecting line between step markers */
+.impl__steps li:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 17px;
+  top: 40px;
+  bottom: 4px;
+  width: 1px;
+  background: var(--line);
+}
+.impl__num {
+  flex: none;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  border: 1.5px solid var(--action);
+  color: var(--action);
+  display: grid;
+  place-items: center;
+  font-size: 0.9375rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  background: var(--white);
+  z-index: 1;
+}
+.impl__steps h3 { font-size: 1.1875rem; font-weight: 650; letter-spacing: -0.015em; padding-top: 0.3rem; }
+.impl__steps p { color: var(--muted); max-width: 52ch; margin-top: 0.45rem; }
+.impl__aside {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 1.9rem 2rem;
+}
+.impl__aside h3 { font-size: 1.0625rem; font-weight: 650; letter-spacing: -0.01em; }
+.impl__aside li { display: flex; align-items: center; gap: 0.9rem; }
+.impl__aside .ico { background: var(--rose); }
+.impl__aside ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  font-size: 0.9375rem;
+}
+.impl__deploy {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.9375rem;
+  font-weight: 550;
+  color: var(--ink);
+}
+
+/* ---------- closing ----------
+   The page's ONE contact moment, serving both audiences. Sales is the dominant
+   path; existing-client support sits beside it, quieter. Nothing here repeats
+   in the footer. */
+.close { padding-block: var(--sec); background: var(--white); }
+.close__panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(260px, 1fr);
+  gap: clamp(2rem, 5vw, 4rem);
+  background: linear-gradient(135deg, var(--burgundy) 0%, var(--burgundy-deep) 100%);
+  color: rgb(var(--paper-rgb));
+  padding: clamp(2.5rem, 5.5vw, 4rem);
+  border-radius: var(--r-lg);
+}
+.close__panel h2 { color: var(--white); max-width: 18ch; }
+.close__lead p {
+  color: #E3C6CB;
+  max-width: 46ch;
+  margin-top: 1.25rem;
+}
+
+/* Two routes, one object. Same treatment for both audiences — the label does
+   the routing, not the affordance. SBV publishes exactly one phone (Sales) and
+   one email (Support); nothing here implies a channel either audience can't use. */
+.close__routes {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-self: center;
+}
+.route {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 1.15rem 1.35rem;
+  border: 1px solid rgb(var(--paper-rgb) / 0.3);
+  border-radius: var(--r-sm);
+  text-decoration: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.route:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.55);
+}
+.route__label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #D6AEB5;
+}
+.route__value {
+  font-size: 1.0625rem;
+  font-weight: 650;
+  color: var(--white);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- footer ----------
+   Identity and legal only — phone and email live in the closing panel. The
+   personality comes from the tagline and the tick rule, not from more content. */
+.ft {
+  background: var(--ground);
+  border-top: 1px solid var(--line);
+  padding-block: clamp(3rem, 6vw, 4rem) 2rem;
+}
+.ft__top {
+  display: flex;
+  align-items: center;
+  gap: clamp(1.25rem, 4vw, 2.75rem);
+  flex-wrap: wrap;
+}
+.ft__top img { width: 120px; height: 88px; object-fit: contain; flex: none; }
+.ft__tag {
+  font-size: clamp(1.5rem, 3.4vw, 2.25rem);
+  font-weight: 650;
+  letter-spacing: -0.022em;
+  color: var(--burgundy);
+}
+.ft__tag .dot { color: var(--action); }
+.ft__rule {
+  height: 9px;
+  margin-top: clamp(2rem, 4vw, 2.75rem);
+  background-image: repeating-linear-gradient(90deg, rgb(var(--burgundy-rgb) / 0.45) 0 1.5px, transparent 1.5px 8px);
+}
+.ft__base {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem 2rem;
+  flex-wrap: wrap;
+  margin-top: 1.25rem;
+  font-size: 0.9375rem;
+  color: var(--muted);
+}
+.ft__legal a { color: var(--muted); text-decoration: none; }
+.ft__legal a:hover { color: var(--action); }
+
+/* ---------- reveal motion ----------
+   Contract: the inline head script sets html.js; main.js confirms it is actually
+   running by adding .js-ok as its first statement. If main.js never executes
+   (404, proxy, CSP), the safety animation force-reveals everything at 2s —
+   content can never stay permanently hidden. Hero elements carry no [data-reveal]
+   at all, so above-the-fold paints instantly regardless. */
+html.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.55s cubic-bezier(0.22, 0.61, 0.36, 1), transform 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+html.js:not(.js-ok) [data-reveal] {
+  animation: reveal-safety 0s linear 2s forwards;
+}
+@keyframes reveal-safety {
+  to { opacity: 1; transform: none; }
+}
+html.js [data-reveal].in { opacity: 1; transform: none; }
+/* gentle stagger inside grids */
+html.js .sol__cards [data-reveal]:nth-child(2),
+html.js .proof__facts [data-reveal]:nth-child(2) { transition-delay: 0.07s; }
+html.js .sol__cards [data-reveal]:nth-child(3),
+html.js .proof__facts [data-reveal]:nth-child(3) { transition-delay: 0.14s; }
+html.js .sol__cards [data-reveal]:nth-child(n+4) { transition-delay: 0.2s; }
+
+@media (prefers-reduced-motion: reduce) {
+  html.js [data-reveal] { opacity: 1; transform: none; transition: none; }
+}
+
+/* ---------- forced colors ---------- */
+@media (forced-colors: active) {
+  .ft__rule, .flow__rail li::after { background: CanvasText; }
+  .proof__arc line { stroke: CanvasText; }
+  .btn, .card, .flow__rail li, .impl__num { border: 1px solid ButtonText; }
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 980px) {
+  .hd__tel { display: none; }
+  .hd__tel-m { display: inline-block; }
+  .hd__nav { gap: 1.25rem; }
+  .hd__actions { gap: 1rem; }
+
+  /* Tablet keeps the two-column hero, on a tighter split with a smaller
+     headline, so the vector never has to stack. */
+  .hero__grid {
+    grid-template-columns: minmax(0, 1.2fr) minmax(230px, 0.8fr);
+    gap: clamp(1.75rem, 3.5vw, 2.75rem);
+  }
+  .hero__block { max-width: none; }
+  .hero__title { font-size: clamp(2.1rem, 4.7vw, 3rem); }
+  .hero__sub { font-size: 1.0625rem; margin-top: 1.4rem; }
+  .hero__cta { margin-top: 2rem; }
+  .sol__cards { grid-template-columns: 1fr 1fr; }
+  .flow__rail { grid-template-columns: 1fr 1fr; gap: 2.25rem; }
+  .flow__rail li:not(:last-child)::after { display: none; }
+  .diff__row { grid-template-columns: 1fr; align-items: start; }
+  .diff__list { max-width: 560px; }
+  .impl__row { grid-template-columns: 1fr; }
+  .impl__aside { max-width: 560px; }
+  .close__panel { grid-template-columns: 1fr; }
+}
+
+/* Below this the columns no longer both fit. The vector is not stacked: its
+   detail is illegible at phone width, stacking orphans it under the CTA, and
+   floating it behind the copy costs text contrast. Pure type reads well, and
+   hiding it pulls the 700+ proof ~350px closer to the fold. */
+@media (max-width: 820px) {
+  .hero__grid { grid-template-columns: 1fr; }
+  .hero__fig { display: none; }
+  .hero__title { font-size: clamp(2.4rem, 7vw, 3.2rem); }
+}
+
+@media (max-width: 680px) {
+  .hd__nav { display: none; }
+  .hd__tel { display: none; }
+  .hd__tel-m { display: inline-block; }
+  .hd__row { min-height: 68px; }
+  .hd__brand img { width: 64px; height: 47px; }
+  .sol__cards { grid-template-columns: 1fr; }
+  .flow__rail { grid-template-columns: 1fr; gap: 1.75rem; }
+  .proof__row { gap: 1.5rem; }
+  .proof__figure { margin-inline: auto; }
+  .hero__cta { flex-wrap: wrap; gap: 1.25rem; }
+  .ft__top img { width: 92px; height: 68px; }
+}
+
+/* ---------- hero vector ----------
+   Inlined so the site's CSS drives it and reduced-motion is honoured by the
+   same rule as everything else. The entrance IS the product story: the surface
+   arrives, the hand sweeps, the link draws, the approval lands. */
+.hero__fig .hv { width: 100%; height: auto; display: block; overflow: visible; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .hv-plane, .hv-surface, .hv-dial, .hv-emp, .hv-pay {
+    animation: hv-rise 0.72s cubic-bezier(0.22, 0.68, 0.3, 1) both;
+  }
+  .hv-plane   { animation-delay: 0.05s; }
+  .hv-surface { animation-delay: 0.14s; }
+  .hv-dial    { animation-delay: 0.34s; }
+  .hv-emp     { animation-delay: 0.5s; }
+  .hv-pay     { animation-delay: 0.62s; }
+
+  /* the clock hand settles into place */
+  .hv-hand {
+    transform-box: fill-box;
+    transform-origin: 0% 0%;
+    animation: hv-sweep 1.05s cubic-bezier(0.18, 0.84, 0.24, 1) 0.42s both;
+  }
+  /* the connection between record and payroll draws itself */
+  .hv-link {
+    stroke-dasharray: 430;
+    animation: hv-draw 0.9s cubic-bezier(0.4, 0, 0.2, 1) 0.95s both;
+  }
+  /* and the approval lands last */
+  .hv-check {
+    stroke-dasharray: 30;
+    animation: hv-draw 0.42s cubic-bezier(0.4, 0, 0.2, 1) 1.35s both;
+  }
+  /* scheduled shifts fill in behind it all */
+  .hv-shifts rect { animation: hv-grow 0.5s cubic-bezier(0.22, 0.68, 0.3, 1) both; transform-box: fill-box; transform-origin: left center; }
+  .hv-shifts rect:nth-child(1) { animation-delay: 0.46s; }
+  .hv-shifts rect:nth-child(2) { animation-delay: 0.54s; }
+  .hv-shifts rect:nth-child(3) { animation-delay: 0.62s; }
+  .hv-shifts rect:nth-child(4) { animation-delay: 0.70s; }
+  .hv-shifts rect:nth-child(5) { animation-delay: 0.78s; }
+  .hv-shifts rect:nth-child(6) { animation-delay: 0.86s; }
+  .hv-shifts rect:nth-child(7) { animation-delay: 0.94s; }
+}
+
+@keyframes hv-rise  { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+@keyframes hv-sweep { from { transform: rotate(-155deg); } to { transform: none; } }
+@keyframes hv-draw  { from { stroke-dashoffset: 430; } to { stroke-dashoffset: 0; } }
+@keyframes hv-grow  { from { opacity: 0; transform: scaleX(0.2); } to { opacity: 1; transform: none; } }
+
+/* ---------- legal pages ----------
+   Deliberately the quietest layout on the site: no reveal motion, no cards, no
+   burgundy field. A policy is read, not scanned, so the only jobs here are
+   measure, hierarchy, and a way in that isn't scrolling. Last block in the file,
+   so its media queries need no extra specificity. */
+/* No border-bottom: the tick rule already terminates the band, and stacking a
+   hairline directly under it reads as an unresolved double edge. */
+.lhead {
+  background: var(--ground);
+  padding-block: clamp(2.75rem, 6vw, 4.25rem) 0;
+}
+.lhead h1 {
+  font-size: clamp(2.2rem, 5vw, 3.1rem);
+  line-height: 1.08;
+  letter-spacing: -0.026em;
+  font-weight: 650;
+  margin: 0;
+}
+.lhead h1 .dot { color: var(--action); }
+.lhead__meta {
+  margin-top: 0.85rem;
+  color: var(--muted);
+  font-size: 0.9375rem;
+}
+.lhead__rule {
+  height: 9px;
+  margin-top: clamp(1.75rem, 4vw, 2.5rem);
+  background-image: repeating-linear-gradient(90deg, rgb(var(--burgundy-rgb) / 0.45) 0 1.5px, transparent 1.5px 8px);
+}
+
+.legal__shell {
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+  gap: clamp(2.5rem, 6vw, 5rem);
+  align-items: start;
+  padding-block: clamp(3rem, 6vw, 4.5rem) var(--sec);
+}
+
+/* Contents rail */
+.toc {
+  position: sticky;
+  top: 116px;
+  border-left: 1px solid var(--line);
+  padding-left: 1.35rem;
+}
+.toc__h {
+  font-size: 0.8125rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.9rem;
+}
+.toc ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: toc;
+}
+.toc li { counter-increment: toc; }
+.toc li + li { margin-top: 0.55rem; }
+/* Hanging indent: a wrapped entry aligns to its own text, not under the number. */
+.toc a {
+  display: block;
+  position: relative;
+  padding: 0.15rem 0 0.15rem 1.4rem;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  transition: color 0.15s ease;
+}
+.toc a::before {
+  content: counter(toc) ".";
+  position: absolute;
+  left: 0;
+  top: 0.15rem;
+  color: var(--burgundy);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.toc a:hover { color: var(--action); }
+
+/* Prose */
+.legal {
+  max-width: 68ch;
+  font-size: 1.0625rem;
+  color: var(--ink);
+}
+.legal__lead {
+  font-size: 1.1875rem;
+  line-height: 1.6;
+  color: var(--ink);
+}
+.legal p + p { margin-top: 1.05rem; }
+
+.legal h2 {
+  font-size: clamp(1.5rem, 2.8vw, 1.9rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  font-weight: 650;
+  max-width: none;
+  margin-top: clamp(3rem, 5vw, 3.75rem);
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--line);
+}
+.legal h3 {
+  font-size: 1.1875rem;
+  font-weight: 650;
+  letter-spacing: -0.012em;
+  margin-top: 2.25rem;
+}
+.legal h4 {
+  font-size: 1rem;
+  font-weight: 650;
+  color: var(--burgundy);
+  margin: 1.75rem 0 0;
+}
+.legal :is(h2, h3, h4) + p { margin-top: 0.75rem; }
+/* headings are jump targets — clear the sticky header */
+.legal :is(h2, h3)[id] { scroll-margin-top: 116px; }
+
+.legal .bullets {
+  list-style: none;
+  margin: 1.05rem 0 0;
+  padding: 0;
+}
+.legal .bullets li {
+  position: relative;
+  padding-left: 1.5rem;
+  margin-top: 0.7rem;
+}
+/* A small burgundy tick rather than a disc — the same mark as the section rules */
+.legal .bullets li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: 8px;
+  height: 2px;
+  background: var(--burgundy);
+}
+.legal .bullets strong { font-weight: 650; }
+
+/* Definitions read far better as a list than as bolded bullet fragments */
+.deflist { margin-top: 1.25rem; }
+.deflist dt {
+  font-weight: 650;
+  color: var(--burgundy);
+  margin-top: 1.35rem;
+}
+.deflist dt:first-of-type { margin-top: 0; }
+.deflist dd {
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+}
+
+.legal a { color: var(--action); }
+
+@media (max-width: 900px) {
+  .legal__shell { grid-template-columns: 1fr; gap: 2.25rem; }
+  .toc {
+    position: static;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 1.5rem 0;
+  }
+  .toc ol { columns: 2; column-gap: 2rem; }
+  .toc li + li { margin-top: 0.5rem; }
+  .legal { max-width: none; }
+}
+
+@media (max-width: 560px) {
+  .toc ol { columns: 1; }
+}

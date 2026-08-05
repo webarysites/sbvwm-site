@@ -1,0 +1,390 @@
+{
+  "pages": [
+    {
+      "url": "https://www.sbvwm.com/",
+      "file": "home.md",
+      "title": "SBV Workforce Management | Make Your Time Count",
+      "description": "",
+      "chars": 1938
+    },
+    {
+      "url": "https://www.sbvwm.com/news/",
+      "file": "news.md",
+      "title": "News | SBV Workforce Management",
+      "description": "",
+      "chars": 0
+    },
+    {
+      "url": "https://www.sbvwm.com/software/",
+      "file": "software.md",
+      "title": "Software | SBV Workforce Management",
+      "description": "",
+      "chars": 853
+    },
+    {
+      "url": "https://www.sbvwm.com/hardware/",
+      "file": "hardware.md",
+      "title": "Hardware | SBV Workforce Management",
+      "description": "",
+      "chars": 2810
+    },
+    {
+      "url": "https://www.sbvwm.com/services/",
+      "file": "services.md",
+      "title": "Services | SBV Workforce Management",
+      "description": "",
+      "chars": 734
+    },
+    {
+      "url": "https://www.sbvwm.com/contact/",
+      "file": "contact.md",
+      "title": "Contact | SBV Workforce Management",
+      "description": "",
+      "chars": 187
+    },
+    {
+      "url": "https://www.sbvwm.com/software/time-attendance/",
+      "file": "software__time-attendance.md",
+      "title": "Time and Attendance | SBV Workforce Management",
+      "description": "",
+      "chars": 1524
+    },
+    {
+      "url": "https://www.sbvwm.com/software/scheduling/",
+      "file": "software__scheduling.md",
+      "title": "Scheduling | SBV Workforce Management",
+      "description": "",
+      "chars": 3689
+    },
+    {
+      "url": "https://www.sbvwm.com/software/accruals/",
+      "file": "software__accruals.md",
+      "title": "Accruals | SBV Workforce Management",
+      "description": "",
+      "chars": 1505
+    },
+    {
+      "url": "https://www.sbvwm.com/software/reports/",
+      "file": "software__reports.md",
+      "title": "Reports | SBV Workforce Management",
+      "description": "",
+      "chars": 2239
+    },
+    {
+      "url": "https://www.sbvwm.com/software/payroll-interfaces/",
+      "file": "software__payroll-interfaces.md",
+      "title": "Payroll Interfaces | SBV Workforce Management",
+      "description": "",
+      "chars": 1184
+    },
+    {
+      "url": "https://www.sbvwm.com/services/implementation/",
+      "file": "services__implementation.md",
+      "title": "Implementation | SBV Workforce Management",
+      "description": "",
+      "chars": 1890
+    },
+    {
+      "url": "https://www.sbvwm.com/software/payroll-based-journal/",
+      "file": "software__payroll-based-journal.md",
+      "title": "Payroll Based Journal | SBV Workforce Management",
+      "description": "",
+      "chars": 723
+    },
+    {
+      "url": "https://www.sbvwm.com/software/health-tracking/",
+      "file": "software__health-tracking.md",
+      "title": "Health Tracking | SBV Workforce Management",
+      "description": "",
+      "chars": 541
+    },
+    {
+      "url": "https://www.sbvwm.com/software/in-service-tracking/",
+      "file": "software__in-service-tracking.md",
+      "title": "In Service Tracking | SBV Workforce Management",
+      "description": "",
+      "chars": 856
+    },
+    {
+      "url": "https://www.sbvwm.com/software/license-tracking/",
+      "file": "software__license-tracking.md",
+      "title": "License Tracking | SBV Workforce Management",
+      "description": "",
+      "chars": 690
+    },
+    {
+      "url": "https://www.sbvwm.com/services/data-extraction/",
+      "file": "services__data-extraction.md",
+      "title": "Data Extraction | SBV Workforce Management",
+      "description": "",
+      "chars": 1944
+    },
+    {
+      "url": "https://www.sbvwm.com/services/training/",
+      "file": "services__training.md",
+      "title": "Training | SBV Workforce Management",
+      "description": "",
+      "chars": 1847
+    },
+    {
+      "url": "https://www.sbvwm.com/services/support/",
+      "file": "services__support.md",
+      "title": "Support | SBV Workforce Management",
+      "description": "",
+      "chars": 958
+    },
+    {
+      "url": "https://www.sbvwm.com/services/maintenance-contracts/",
+      "file": "services__maintenance-contracts.md",
+      "title": "Maintenance Contracts | SBV Workforce Management",
+      "description": "",
+      "chars": 1211
+    },
+    {
+      "url": "https://www.sbvwm.com/software/time-attendance/employee-information/",
+      "file": "software__time-attendance__employee-information.md",
+      "title": "Employee Information | SBV Workforce Management",
+      "description": "",
+      "chars": 351
+    },
+    {
+      "url": "https://www.sbvwm.com/software/time-attendance/time-cards-and-hours/",
+      "file": "software__time-attendance__time-cards-and-hours.md",
+      "title": "Time Cards and Hours | SBV Workforce Management",
+      "description": "",
+      "chars": 428
+    },
+    {
+      "url": "https://www.sbvwm.com/software/time-attendance/schedules/",
+      "file": "software__time-attendance__schedules.md",
+      "title": "Schedules | SBV Workforce Management",
+      "description": "",
+      "chars": 489
+    },
+    {
+      "url": "https://www.sbvwm.com/software/time-attendance/calculation-engine/",
+      "file": "software__time-attendance__calculation-engine.md",
+      "title": "Calculation Engine | SBV Workforce Management",
+      "description": "",
+      "chars": 541
+    },
+    {
+      "url": "https://www.sbvwm.com/software/time-attendance/other-features/",
+      "file": "software__time-attendance__other-features.md",
+      "title": "Other Features | SBV Workforce Management",
+      "description": "",
+      "chars": 375
+    },
+    {
+      "url": "https://www.sbvwm.com/support/",
+      "file": "support.md",
+      "title": "Support | SBV Workforce Management",
+      "description": "",
+      "chars": 53
+    },
+    {
+      "url": "https://www.sbvwm.com/deployment/",
+      "file": "deployment.md",
+      "title": "Deployment | SBV Workforce Management",
+      "description": "",
+      "chars": 371
+    },
+    {
+      "url": "https://www.sbvwm.com/privacy-policy/",
+      "file": "privacy-policy.md",
+      "title": "Privacy \u00a0Policy | SBV Workforce Management",
+      "description": "",
+      "chars": 12467
+    }
+  ],
+  "assets": [
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2016/12/TABrochureHC.pdf",
+      "file": "TABrochureHC.pdf"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/01/handpunch1000.jpg",
+      "file": "handpunch1000.jpg"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/01/handpunch2000.jpg",
+      "file": "handpunch2000.jpg"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/01/handpunch3000.jpg",
+      "file": "handpunch3000.jpg"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/01/handpunch4000.jpg",
+      "file": "handpunch4000.jpg"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/06/Accrual-Report.png",
+      "file": "Accrual-Report.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/06/Accruals-1.png",
+      "file": "Accruals-1.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/06/Adjustments-1.png",
+      "file": "Adjustments-1.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/06/Attendance-Report.png",
+      "file": "Attendance-Report.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/06/Budget-Report.png",
+      "file": "Budget-Report.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/06/Clock-Report.png",
+      "file": "Clock-Report.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/06/Configuration-Report.png",
+      "file": "Configuration-Report.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/06/Detail-1.png",
+      "file": "Detail-1.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/06/Employee-Report-1.png",
+      "file": "Employee-Report-1.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/06/Employee-Report-2.png",
+      "file": "Employee-Report-2.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/06/Employment-Report.png",
+      "file": "Employment-Report.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/06/Entitlement-Overrides-1.png",
+      "file": "Entitlement-Overrides-1.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/06/Health-Tracking-1.png",
+      "file": "Health-Tracking-1.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/06/Hours-Report.png",
+      "file": "Hours-Report.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/06/In-Service-Report.png",
+      "file": "In-Service-Report.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/06/In-Service-Tracking.png",
+      "file": "In-Service-Tracking.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/06/License-Tracking-1.png",
+      "file": "License-Tracking-1.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/06/Punch-Form.png",
+      "file": "Punch-Form.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/06/Punch-Report.png",
+      "file": "Punch-Report.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/06/Punch-Sheet.png",
+      "file": "Punch-Sheet.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/06/Reports.png",
+      "file": "Reports.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/06/Schedule-Form.png",
+      "file": "Schedule-Form.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/06/Schedule-and-Shift-Report.png",
+      "file": "Schedule-and-Shift-Report.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/06/Schedule.png",
+      "file": "Schedule.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/06/Scheduling-Report.png",
+      "file": "Scheduling-Report.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/06/Staffing-Report.png",
+      "file": "Staffing-Report.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/06/Time-and-Attendance11.png",
+      "file": "Time-and-Attendance11.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/07/Available-Filtering.png",
+      "file": "Available-Filtering.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/07/Availables.png",
+      "file": "Availables.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/07/Contexual-Menu.png",
+      "file": "Contexual-Menu.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/07/Crossing-a-Group.png",
+      "file": "Crossing-a-Group.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/07/Employee-Fields.png",
+      "file": "Employee-Fields.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/07/Employee-Tool-Tip.png",
+      "file": "Employee-Tool-Tip.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/07/Filter-Then-Find.png",
+      "file": "Filter-Then-Find.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/07/Find-and-Filter.png",
+      "file": "Find-and-Filter.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/07/From-Availables.png",
+      "file": "From-Availables.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/07/Group-Collapse.png",
+      "file": "Group-Collapse.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/07/Group-Filtering.png",
+      "file": "Group-Filtering.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/07/Schedule-Tool-Tip.png",
+      "file": "Schedule-Tool-Tip.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/07/Scheduler-Grid.png",
+      "file": "Scheduler-Grid.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/07/Sort-Order.png",
+      "file": "Sort-Order.png"
+    },
+    {
+      "url": "https://www.sbvwm.com/wp-content/uploads/2017/07/Weekly-Totals.png",
+      "file": "Weekly-Totals.png"
+    }
+  ]
+}

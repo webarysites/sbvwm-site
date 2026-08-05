@@ -1,0 +1,17 @@
+# Verification artifacts — screenshots are evidence for a single check, not deliverables
+.playwright-mcp/
+test-screenshots/
+*-1366.png
+*-1280.png
+
+# Internal agency economics — never publish on a client repo
+site/COST-RECEIPT.md
+
+# Local tooling
+.claude/
+graphify-out/
+
+# OS
+Thumbs.db
+desktop.ini
+.DS_Store
