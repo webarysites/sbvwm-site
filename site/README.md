@@ -39,8 +39,14 @@ preload is correct over HTTP; don't remove it to silence a local-only warning.
 ## Pending before launch
 
 - Verify the "700+ facilities" figure and its wording
-- Verify payroll-provider names (ADP, PayChex, Viventium)
+- **Verify "Over 250 reports"** — now a headline claim on the Reporting card.
+  Taken verbatim from the legacy Reports page, so it is already published, but
+  the copy rewrite promoted it from absent to prominent. Confirm it still holds.
 - Confirm HandPunch support statement
+- Payroll-provider names (ADP, PayChex, Viventium) were removed from the
+  Payroll Interfaces card by the copy rewrite, which describes the process
+  instead. Nothing on the page names a provider now, so there is no longer a
+  provider list to verify — reinstate only if the client wants them named.
 - `/contact/` and `/support/` pages still to be built (all CTAs currently use on-page anchors + `tel:` / `mailto:` so nothing dead-ends)
 - Redirect map from legacy URLs still to be configured
 - **Privacy policy needs legal review before launch** — see below
