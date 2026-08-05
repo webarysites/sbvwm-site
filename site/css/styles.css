@@ -150,6 +150,29 @@ a { color: var(--action); }
   background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--line);
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Scrolled state. Deliberately not a drop shadow: the header should read as
+   separated from the page, not floating above it. So the white firms up, the
+   hairline darkens slightly, and the shadow is shallow enough to be a seam.
+   Set by main.js via a sentinel — no scroll listener, so no per-frame work on
+   the older office hardware this audience runs. Absent if JS never loads, which
+   costs nothing. */
+.hd--stuck {
+  background: rgba(255, 255, 255, 0.985);
+  border-bottom-color: rgb(var(--ink-rgb) / 0.13);
+  box-shadow: 0 1px 0 rgb(var(--ink-rgb) / 0.03), 0 4px 10px rgb(var(--ink-rgb) / 0.05);
+}
+
+/* Height sets the scroll distance at which the header separates. */
+.hd-sentinel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 60px;
+  pointer-events: none;
 }
 .hd__row {
   display: flex;
@@ -648,8 +671,48 @@ html.js .sol__cards [data-reveal]:nth-child(3),
 html.js .proof__facts [data-reveal]:nth-child(3) { transition-delay: 0.14s; }
 html.js .sol__cards [data-reveal]:nth-child(n+4) { transition-delay: 0.2s; }
 
+/* ---------- sequenced reveals ----------
+   Two sections are ordered rather than merely grouped: the flow rail is a
+   five-step process and the implementation list is four numbered stages. Order
+   is part of the meaning there, so their children arrive in sequence.
+
+   This DELAYS THE SAME TRANSITION every other reveal already uses. It does not
+   layer a second animation on top — that would fade the group in as a block and
+   then re-animate each child, which reads as fussy. It also runs exactly once:
+   main.js unobserves each element after it fires and .in is never removed. */
+
+/* Flow rail — 80ms apart, shorter travel and a quicker fade than the default,
+   because five columns moving one after another need less movement each to read
+   as a sequence. Last step starts at 320ms, all settled by ~740ms. */
+html.js .flow__rail > li[data-reveal] {
+  transform: translateY(10px);
+  transition-duration: 0.42s;
+}
+/* Must restate .in at this specificity: the selector above (0,3,2) outranks the
+   shared `html.js [data-reveal].in` rule (0,3,1) and would otherwise pin these
+   items 10px down permanently. */
+html.js .flow__rail > li[data-reveal].in { transform: none; }
+html.js .flow__rail > li[data-reveal]:nth-child(2) { transition-delay: 0.08s; }
+html.js .flow__rail > li[data-reveal]:nth-child(3) { transition-delay: 0.16s; }
+html.js .flow__rail > li[data-reveal]:nth-child(4) { transition-delay: 0.24s; }
+html.js .flow__rail > li[data-reveal]:nth-child(5) { transition-delay: 0.32s; }
+
+/* Implementation — 100ms apart. Larger text rows than the rail, so they can
+   carry a longer interval; last step starts at 300ms, settled by ~850ms. */
+html.js .impl__steps > li[data-reveal]:nth-child(2) { transition-delay: 0.1s; }
+html.js .impl__steps > li[data-reveal]:nth-child(3) { transition-delay: 0.2s; }
+html.js .impl__steps > li[data-reveal]:nth-child(4) { transition-delay: 0.3s; }
+
+/* Selectors restated so this outranks the sequenced rules above — a media query
+   adds no specificity of its own. */
 @media (prefers-reduced-motion: reduce) {
-  html.js [data-reveal] { opacity: 1; transform: none; transition: none; }
+  html.js [data-reveal],
+  html.js .flow__rail > li[data-reveal],
+  html.js .flow__rail > li[data-reveal].in {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 /* ---------- forced colors ---------- */
