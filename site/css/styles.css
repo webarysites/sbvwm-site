@@ -416,9 +416,6 @@ a { color: var(--action); }
   color: var(--burgundy);
 }
 
-/* solutions section sits on white; cards get depth from the shadow itself */
-.sol .sec-head__intro { padding-bottom: 0.35rem; }
-
 /* ---------- differentiation (light, split) ---------- */
 .diff { background: var(--white); padding-block: var(--sec); }
 .diff__row {
