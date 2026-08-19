@@ -1,27 +1,29 @@
 /* SBV Workforce Management — mini-site (visual system v2)
    Direction: docs/design-direction.md + 2026-08-05 revision.
-   White-dominant environment; burgundy is an accent and action color, not the
+   2026-08-18: recoloured to the client's purple brand palette (light-purple
+   gradient #948EFF -> #564FE8, neutrals #353849 / #596074).
+   White-dominant environment; purple is an accent and action color, not the
    atmosphere. One dark moment only (the closing panel). Soft cards, connected
    implementation steps, and a punch-to-payroll flow rail. Motion is
    reveal-on-enter only; content renders fully without JS (see reveal contract). */
 
 /* ---------- tokens ---------- */
 :root {
-  --burgundy: #651725;
-  --burgundy-deep: #4A0F1B;
-  --action: #9F2430;
-  --ground: #F6F4F2;
-  --rose: #F8EFF0;
-  --rose-line: #ECDBDD;
-  --ink: #231F20;
-  --muted: #6B625F;
-  --line: #E7E1DC;
+  --purple: #332C9E;
+  --purple-deep: #1F1B63;
+  --action: #564FE8;
+  --ground: #F5F6FA;
+  --lilac: #F1F0FE;
+  --lilac-line: #DEDCFA;
+  --ink: #353849;
+  --muted: #596074;
+  --line: #E3E5EE;
   --gold: #F6BC53;
   --white: #FFFFFF;
   /* channel values so tints derive from the brand instead of being hand-mixed */
-  --burgundy-rgb: 101 23 37;
-  --ink-rgb: 35 31 32;
-  --paper-rgb: 241 222 225;
+  --purple-rgb: 86 79 232;
+  --ink-rgb: 53 56 73;
+  --paper-rgb: 231 230 252;
 
   --shadow: 0 1px 2px rgb(var(--ink-rgb) / 0.05), 0 4px 14px rgb(var(--ink-rgb) / 0.04);
   --shadow-lift: 0 2px 4px rgb(var(--ink-rgb) / 0.06), 0 10px 26px rgb(var(--ink-rgb) / 0.07);
@@ -93,7 +95,7 @@ a { color: var(--action); }
   transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .btn--solid { background: var(--action); color: var(--white); }
-.btn--solid:hover { background: var(--burgundy); }
+.btn--solid:hover { background: var(--purple); }
 .btn--lg { padding: 1rem 1.9rem; font-size: 1rem; }
 
 /* ---------- shared list icon ----------
@@ -106,16 +108,16 @@ a { color: var(--action); }
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  border: 1px solid var(--rose-line);
+  border: 1px solid var(--lilac-line);
   background: var(--white);
-  color: var(--burgundy);
+  color: var(--purple);
 }
 
 .textlink {
   font-weight: 600;
   color: var(--action);
   text-decoration: none;
-  border-bottom: 1px solid rgb(159 36 48 / 0.35);
+  border-bottom: 1px solid rgb(var(--purple-rgb) / 0.35);
   padding-bottom: 2px;
   transition: border-color 0.15s ease;
 }
@@ -132,7 +134,7 @@ a { color: var(--action); }
   position: absolute;
   left: 1rem; top: -3.5rem;
   z-index: 100;
-  background: var(--burgundy);
+  background: var(--purple);
   color: var(--white);
   padding: 0.6rem 1rem;
   border-radius: 0 0 8px 8px;
@@ -274,14 +276,14 @@ a { color: var(--action); }
   aspect-ratio: 1;
 }
 .proof__arc { position: absolute; inset: 0; width: 100%; height: 100%; }
-.proof__arc line { stroke: rgb(var(--burgundy-rgb) / 0.26); stroke-width: 1; }
-.proof__arc line.mj { stroke: rgb(var(--burgundy-rgb) / 0.5); stroke-width: 1.5; }
+.proof__arc line { stroke: rgb(var(--purple-rgb) / 0.26); stroke-width: 1; }
+.proof__arc line.mj { stroke: rgb(var(--purple-rgb) / 0.5); stroke-width: 1.5; }
 .proof__num {
   font-size: clamp(4.6rem, 13vw, 8.25rem);
   font-weight: 700;
   letter-spacing: -0.045em;
   line-height: 1;
-  color: var(--burgundy);
+  color: var(--purple);
   font-variant-numeric: tabular-nums;
 }
 .proof__num sup {
@@ -330,13 +332,13 @@ a { color: var(--action); }
 
 /* ---------- flow (the product story, and the page's second anchor) ---------- */
 .flowsec {
-  background: linear-gradient(160deg, var(--burgundy) 0%, var(--burgundy-deep) 100%);
+  background: linear-gradient(160deg, var(--purple) 0%, var(--purple-deep) 100%);
   color: rgb(var(--paper-rgb));
   padding-block: var(--sec);
 }
 .flow__title { color: var(--white); max-width: 20ch; }
 .flow__intro {
-  color: #DCBEC3;
+  color: #C7C3F4;
   font-size: clamp(1.0625rem, 1.8vw, 1.1875rem);
   max-width: 56ch;
   margin-top: 1.25rem;
@@ -369,7 +371,7 @@ a { color: var(--action); }
   height: 52px;
   border-radius: 50%;
   border: 1px solid rgb(var(--paper-rgb) / 0.32);
-  background: rgb(var(--burgundy-rgb) / 0.55);
+  background: rgb(var(--purple-rgb) / 0.55);
   color: var(--gold);
 }
 .flow__rail h3 {
@@ -383,7 +385,7 @@ a { color: var(--action); }
   margin-top: 0.5rem;
   font-size: 0.875rem;
   line-height: 1.55;
-  color: #D2AFB6;
+  color: #BDB8F0;
 }
 
 /* ---------- solutions ---------- */
@@ -396,8 +398,8 @@ a { color: var(--action); }
 }
 /* Time & Attendance: same shape as every other card, distinguished by tint only */
 .card--tint {
-  background: var(--rose);
-  border-color: var(--rose-line);
+  background: var(--lilac);
+  border-color: var(--lilac-line);
 }
 .card {
   background: var(--white);
@@ -410,10 +412,10 @@ a { color: var(--action); }
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .card:hover {
-  border-color: rgb(var(--burgundy-rgb) / 0.3);
+  border-color: rgb(var(--purple-rgb) / 0.3);
   box-shadow: var(--shadow-lift);
 }
-.card__icon { color: var(--burgundy); line-height: 0; margin-bottom: 1.1rem; }
+.card__icon { color: var(--purple); line-height: 0; margin-bottom: 1.1rem; }
 .card h3 {
   font-size: 1.125rem;
   font-weight: 650;
@@ -436,7 +438,7 @@ a { color: var(--action); }
   border-top: 1px solid var(--line);
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--burgundy);
+  color: var(--purple);
 }
 
 /* ---------- differentiation (light, split) ---------- */
@@ -465,8 +467,8 @@ a { color: var(--action); }
   list-style: none;
   padding: 2rem 2.1rem;
   margin: 0;
-  background: var(--rose);
-  border: 1px solid var(--rose-line);
+  background: var(--lilac);
+  border: 1px solid var(--lilac-line);
   border-radius: var(--r-md);
   display: flex;
   flex-direction: column;
@@ -531,7 +533,7 @@ a { color: var(--action); }
 }
 .impl__aside h3 { font-size: 1.0625rem; font-weight: 650; letter-spacing: -0.01em; }
 .impl__aside li { display: flex; align-items: center; gap: 0.9rem; }
-.impl__aside .ico { background: var(--rose); }
+.impl__aside .ico { background: var(--lilac); }
 .impl__aside ul {
   list-style: none;
   padding: 0;
@@ -559,14 +561,14 @@ a { color: var(--action); }
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(260px, 1fr);
   gap: clamp(2rem, 5vw, 4rem);
-  background: linear-gradient(135deg, var(--burgundy) 0%, var(--burgundy-deep) 100%);
+  background: linear-gradient(135deg, var(--purple) 0%, var(--purple-deep) 100%);
   color: rgb(var(--paper-rgb));
   padding: clamp(2.5rem, 5.5vw, 4rem);
   border-radius: var(--r-lg);
 }
 .close__panel h2 { color: var(--white); max-width: 18ch; }
 .close__lead p {
-  color: #E3C6CB;
+  color: #CFCBF6;
   max-width: 46ch;
   margin-top: 1.25rem;
 }
@@ -597,7 +599,7 @@ a { color: var(--action); }
 .route__label {
   font-size: 0.8125rem;
   font-weight: 600;
-  color: #D6AEB5;
+  color: #C0BBF1;
 }
 .route__value {
   font-size: 1.0625rem;
@@ -625,13 +627,13 @@ a { color: var(--action); }
   font-size: clamp(1.5rem, 3.4vw, 2.25rem);
   font-weight: 650;
   letter-spacing: -0.022em;
-  color: var(--burgundy);
+  color: var(--purple);
 }
 .ft__tag .dot { color: var(--action); }
 .ft__rule {
   height: 9px;
   margin-top: clamp(2rem, 4vw, 2.75rem);
-  background-image: repeating-linear-gradient(90deg, rgb(var(--burgundy-rgb) / 0.45) 0 1.5px, transparent 1.5px 8px);
+  background-image: repeating-linear-gradient(90deg, rgb(var(--purple-rgb) / 0.45) 0 1.5px, transparent 1.5px 8px);
 }
 .ft__base {
   display: flex;
@@ -823,7 +825,7 @@ html.js .impl__steps > li[data-reveal]:nth-child(4) { transition-delay: 0.3s; }
 
 /* ---------- legal pages ----------
    Deliberately the quietest layout on the site: no reveal motion, no cards, no
-   burgundy field. A policy is read, not scanned, so the only jobs here are
+   purple field. A policy is read, not scanned, so the only jobs here are
    measure, hierarchy, and a way in that isn't scrolling. Last block in the file,
    so its media queries need no extra specificity. */
 /* No border-bottom: the tick rule already terminates the band, and stacking a
@@ -848,7 +850,7 @@ html.js .impl__steps > li[data-reveal]:nth-child(4) { transition-delay: 0.3s; }
 .lhead__rule {
   height: 9px;
   margin-top: clamp(1.75rem, 4vw, 2.5rem);
-  background-image: repeating-linear-gradient(90deg, rgb(var(--burgundy-rgb) / 0.45) 0 1.5px, transparent 1.5px 8px);
+  background-image: repeating-linear-gradient(90deg, rgb(var(--purple-rgb) / 0.45) 0 1.5px, transparent 1.5px 8px);
 }
 
 .legal__shell {
@@ -898,7 +900,7 @@ html.js .impl__steps > li[data-reveal]:nth-child(4) { transition-delay: 0.3s; }
   position: absolute;
   left: 0;
   top: 0.15rem;
-  color: var(--burgundy);
+  color: var(--purple);
   font-variant-numeric: tabular-nums;
   font-weight: 600;
 }
@@ -936,7 +938,7 @@ html.js .impl__steps > li[data-reveal]:nth-child(4) { transition-delay: 0.3s; }
 .legal h4 {
   font-size: 1rem;
   font-weight: 650;
-  color: var(--burgundy);
+  color: var(--purple);
   margin: 1.75rem 0 0;
 }
 .legal :is(h2, h3, h4) + p { margin-top: 0.75rem; }
@@ -953,7 +955,7 @@ html.js .impl__steps > li[data-reveal]:nth-child(4) { transition-delay: 0.3s; }
   padding-left: 1.5rem;
   margin-top: 0.7rem;
 }
-/* A small burgundy tick rather than a disc — the same mark as the section rules */
+/* A small purple tick rather than a disc — the same mark as the section rules */
 .legal .bullets li::before {
   content: "";
   position: absolute;
@@ -961,7 +963,7 @@ html.js .impl__steps > li[data-reveal]:nth-child(4) { transition-delay: 0.3s; }
   top: 0.72em;
   width: 8px;
   height: 2px;
-  background: var(--burgundy);
+  background: var(--purple);
 }
 .legal .bullets strong { font-weight: 650; }
 
@@ -969,7 +971,7 @@ html.js .impl__steps > li[data-reveal]:nth-child(4) { transition-delay: 0.3s; }
 .deflist { margin-top: 1.25rem; }
 .deflist dt {
   font-weight: 650;
-  color: var(--burgundy);
+  color: var(--purple);
   margin-top: 1.35rem;
 }
 .deflist dt:first-of-type { margin-top: 0; }

@@ -1,5 +1,14 @@
 # SBV Mini-Site — Design Direction & Build Spec
 
+> **PALETTE SUPERSEDED 2026-08-18.** The client supplied his own brand colours
+> (light-purple gradient `#948EFF` → `#564FE8`, neutrals `#353849` / `#596074`,
+> white) and asked for the site to move off red. Everything below still describes
+> the layout, composition and typographic decisions accurately — only the *hue*
+> changed. Wherever this document says burgundy / red / rose, read purple / lilac;
+> the live token values are in `site/css/styles.css`. Gold is retained as the one
+> accent. The client's logo redesign was still in progress on that date, so the
+> logo SVGs here are a temporary recolour of the existing mark.
+
 > **Revision 2026-08-05 (v2, after GPT review of the built site).** The v1 build
 > let burgundy become the atmosphere; v2 corrects the execution, not the logic:
 > white-dominant environment; burgundy demoted to accent/action + ONE dark moment
