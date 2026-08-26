@@ -1,0 +1,84 @@
+## Publishes site/ to GitHub Pages as the PRODUCTION site at www.sbvwm.com.
+##
+## This file used to serve a client preview and injected a noindex meta tag plus a
+## blocking robots.txt at build time, because a Pages site from this repo is publicly
+## reachable by URL and an unfinished preview must not be indexed. Going live inverts
+## that requirement: the guard below now FAILS the build if a noindex ever reappears,
+## so the tag can't creep back in and quietly delist the real site.
+##
+## The custom domain is written as a CNAME file here rather than kept in site/, so the
+## production hostname lives in exactly one place and the source tree stays host-agnostic
+## for local development. Paths in the site are relative, so it serves correctly either way.
+
+name: Deploy to GitHub Pages (www.sbvwm.com)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two deploys race; a queued one supersedes the one in flight.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+env:
+  PROD_HOST: www.sbvwm.com
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Assemble site
+        run: cp -r site _site
+
+      - name: Attach the custom domain
+        run: printf '%s\n' "$PROD_HOST" > _site/CNAME
+
+      - name: Allow indexing, and point crawlers at the canonical host
+        run: |
+          printf 'User-agent: *\nAllow: /\n\nSitemap: https://%s/sitemap.xml\n' "$PROD_HOST" > _site/robots.txt
+
+      - name: Generate sitemap
+        run: |
+          {
+            printf '<?xml version="1.0" encoding="UTF-8"?>\n'
+            printf '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+            printf '  <url><loc>https://%s/</loc><priority>1.0</priority></url>\n' "$PROD_HOST"
+            printf '  <url><loc>https://%s/privacy-policy/</loc><priority>0.3</priority></url>\n' "$PROD_HOST"
+            printf '</urlset>\n'
+          } > _site/sitemap.xml
+
+      - name: Skip Jekyll processing
+        run: touch _site/.nojekyll
+
+      - name: Refuse to ship a noindex to production
+        run: |
+          if grep -rl 'content="noindex' _site --include='*.html'; then
+            echo "::error::a noindex tag reached the production build — the live site would be delisted"
+            exit 1
+          fi
+          grep -q '^Allow: /' _site/robots.txt || { echo "::error::robots.txt is not allowing crawlers"; exit 1; }
+          test "$(cat _site/CNAME)" = "$PROD_HOST" || { echo "::error::CNAME does not match PROD_HOST"; exit 1; }
+          echo "production guards passed: no noindex, robots allows, CNAME=$PROD_HOST"
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
