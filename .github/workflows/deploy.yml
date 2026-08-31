@@ -1,16 +1,23 @@
-## Publishes site/ to GitHub Pages as the PRODUCTION site at www.sbvwm.com.
+## Publishes site/ to GitHub Pages, in one of two modes.
 ##
-## This file used to serve a client preview and injected a noindex meta tag plus a
-## blocking robots.txt at build time, because a Pages site from this repo is publicly
-## reachable by URL and an unfinished preview must not be indexed. Going live inverts
-## that requirement: the guard below now FAILS the build if a noindex ever reappears,
-## so the tag can't creep back in and quietly delist the real site.
+## The mode is decided by the repository variable PROD_HOST, NOT by editing this file:
 ##
-## The custom domain is written as a CNAME file here rather than kept in site/, so the
-## production hostname lives in exactly one place and the source tree stays host-agnostic
-## for local development. Paths in the site are relative, so it serves correctly either way.
+##   unset  -> PREVIEW. No CNAME, and a noindex meta tag plus a blocking robots.txt are
+##             injected at build time. A Pages site from this repo is publicly reachable
+##             by URL, so an unfinished preview must never be indexed.
+##   set     -> PRODUCTION at that hostname. Emits CNAME, a crawlable robots.txt and a
+##             sitemap, and fails the build if a noindex ever reaches the output.
+##
+## Why a variable and not a code change: the CNAME file is what actually attaches the
+## custom domain, and it is re-asserted on every deploy. Removing the domain in the Pages
+## UI or API therefore does not stick - the next deploy puts it back. Flipping the switch
+## has to be the same action as flipping the DNS, or the two drift apart and the preview
+## link starts redirecting at a domain that still serves the old site.
+##
+## To go live:   gh variable set PROD_HOST --body www.sbvwm.com   (then change DNS)
+## To roll back: gh variable delete PROD_HOST                     (then revert DNS)
 
-name: Deploy to GitHub Pages (www.sbvwm.com)
+name: Deploy to GitHub Pages
 
 on:
   push:
@@ -28,7 +35,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  PROD_HOST: www.sbvwm.com
+  PROD_HOST: ${{ vars.PROD_HOST }}
 
 jobs:
   build:
@@ -39,15 +46,26 @@ jobs:
       - name: Assemble site
         run: cp -r site _site
 
-      - name: Attach the custom domain
-        run: printf '%s\n' "$PROD_HOST" > _site/CNAME
-
-      - name: Allow indexing, and point crawlers at the canonical host
+      - name: Report which mode this build is in
         run: |
+          if [ -n "$PROD_HOST" ]; then
+            echo "PRODUCTION build for $PROD_HOST"
+          else
+            echo "PREVIEW build - no custom domain, noindex will be injected"
+          fi
+
+      - name: Preview — keep it out of search results
+        if: ${{ vars.PROD_HOST == '' }}
+        run: |
+          printf 'User-agent: *\nDisallow: /\n' > _site/robots.txt
+          find _site -name '*.html' -exec \
+            sed -i 's|<head>|<head>\n  <meta name="robots" content="noindex, nofollow" />|' {} +
+
+      - name: Production — attach the domain, invite crawlers
+        if: ${{ vars.PROD_HOST != '' }}
+        run: |
+          printf '%s\n' "$PROD_HOST" > _site/CNAME
           printf 'User-agent: *\nAllow: /\n\nSitemap: https://%s/sitemap.xml\n' "$PROD_HOST" > _site/robots.txt
-
-      - name: Generate sitemap
-        run: |
           {
             printf '<?xml version="1.0" encoding="UTF-8"?>\n'
             printf '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
@@ -59,15 +77,21 @@ jobs:
       - name: Skip Jekyll processing
         run: touch _site/.nojekyll
 
-      - name: Refuse to ship a noindex to production
+      - name: Verify the build matches its mode
         run: |
-          if grep -rl 'content="noindex' _site --include='*.html'; then
-            echo "::error::a noindex tag reached the production build — the live site would be delisted"
-            exit 1
+          noindexed=$(grep -rl 'content="noindex' _site --include='*.html' | wc -l)
+          total=$(find _site -name '*.html' | wc -l)
+          if [ -n "$PROD_HOST" ]; then
+            [ "$noindexed" -eq 0 ] || { echo "::error::a noindex reached the production build — the live site would be delisted"; exit 1; }
+            grep -q '^Allow: /' _site/robots.txt || { echo "::error::robots.txt is not allowing crawlers"; exit 1; }
+            [ "$(cat _site/CNAME)" = "$PROD_HOST" ] || { echo "::error::CNAME does not match PROD_HOST"; exit 1; }
+            echo "production OK: no noindex, robots allows, CNAME=$PROD_HOST"
+          else
+            [ "$noindexed" -eq "$total" ] || { echo "::error::preview build is missing noindex on some pages"; exit 1; }
+            [ ! -f _site/CNAME ] || { echo "::error::preview build must not carry a CNAME"; exit 1; }
+            grep -q '^Disallow: /' _site/robots.txt || { echo "::error::preview robots.txt is not blocking crawlers"; exit 1; }
+            echo "preview OK: noindex on all $total pages, no CNAME, robots blocks"
           fi
-          grep -q '^Allow: /' _site/robots.txt || { echo "::error::robots.txt is not allowing crawlers"; exit 1; }
-          test "$(cat _site/CNAME)" = "$PROD_HOST" || { echo "::error::CNAME does not match PROD_HOST"; exit 1; }
-          echo "production guards passed: no noindex, robots allows, CNAME=$PROD_HOST"
 
       - uses: actions/upload-pages-artifact@v3
         with:
